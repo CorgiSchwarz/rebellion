@@ -51,7 +51,6 @@ public class Agent extends Movable{
         return (double) copCount / activeCount;
     }
 
-
     boolean determineBehavior() {
         if (jailTerm == 0 && !active) {
             double copR = getCopRatio();

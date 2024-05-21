@@ -31,9 +31,6 @@ public class Cop extends Movable {
         return null;
     }
 
-    public int getId() {
-        return id;
-    }
     public String toString() {
         return "Cop " + id + ": (" + location.x
             + ", " + location.y + ")";

@@ -1,12 +1,7 @@
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    private static ArrayList<Agent> agents;
-    private static ArrayList<Cop> cops;
     public static void main(String[] args) {
         int length, width;
         Scanner scanner = new Scanner(System.in);
