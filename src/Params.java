@@ -5,4 +5,5 @@ public class Params {
     static int MAX_JAIL_TERM;
     static boolean MOVEMENT;
     static double VISION_RADIUS;
+    static String dirPath;
 }

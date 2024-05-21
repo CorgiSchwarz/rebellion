@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,13 +26,24 @@ public class Main {
         Params.GOVERNMENT_LEGITIMACY = scanner.nextDouble();
         Params.MAX_JAIL_TERM = scanner.nextInt();
         Params.MOVEMENT = scanner.nextBoolean();
+        createResultDir();
 
         Coordinator coordinator = new Coordinator(numOfCops, numOfAgents, map);
         int tick = 0;
 
-        while (tick++ < 10) {
+        while (tick++ < 300) {
             System.out.println("tick: " + tick);
             coordinator.goTick();
+        }
+    }
+
+    private static void createResultDir() {
+        String currentDirectory = System.getProperty("user.dir");
+        Params.dirPath = currentDirectory + File.separator + "result";
+
+        File resultDir = new File(Params.dirPath);
+        if (!resultDir.exists()) {
+            resultDir.mkdirs();
         }
     }
 }

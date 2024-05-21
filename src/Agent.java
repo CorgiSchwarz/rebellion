@@ -52,15 +52,19 @@ public class Agent extends Movable{
     }
 
 
-    void determineBehavior() {
-        double copR = getCopRatio();
-        double estimatedArrestProbability = 1 - Math.exp(
-            -Params.K * Math.floor(copR));
-        double netRisk = grievance - risk_aversion * estimatedArrestProbability;
-        if (netRisk > Params.THRESHOLD) {
-            active = true;
-            map.setPatchStatus(location, GridStatus.AGENT_ACTIVE);
+    boolean determineBehavior() {
+        if (jailTerm == 0 && !active) {
+            double copR = getCopRatio();
+            double estimatedArrestProbability = 1 - Math.exp(
+                -Params.K * Math.floor(copR));
+            double netRisk = grievance - risk_aversion * estimatedArrestProbability;
+            if (netRisk > Params.THRESHOLD) {
+                active = true;
+                map.setPatchStatus(location, GridStatus.AGENT_ACTIVE);
+                return true;
+            }
         }
+        return false;
     }
 
     public void sendToJail(int jailTerm) {

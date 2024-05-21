@@ -1,3 +1,7 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +42,14 @@ public class Coordinator {
             cops.add(new Cop(location, i, map));
         }
         System.out.println("init map");
-        map.print();
+//        map.print();
+
+        String csvFile = Params.dirPath + File.separator + "agent.csv";
+        try (PrintWriter writer = new PrintWriter(new FileWriter(csvFile))) {
+            writer.println("quiet,jailed,active");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     Agent getAgentByLocation(Location location) {
@@ -56,24 +67,33 @@ public class Coordinator {
             numbers.add(i);
         }
         Collections.shuffle(numbers);
-
+        int arrest = 0;
+        int arise = 0;
         for (int i = 0; i < numbers.size(); i++) {
-            if (i < agents.size()) {
-                agents.get(i).move();
-                agents.get(i).determineBehavior();
+            int id = numbers.get(i);
+            if (id < agents.size()) {
+                agents.get(id).move();
+                boolean becomeActive = agents.get(id).determineBehavior();
+                if (becomeActive) {
+                    arise++;
+                }
             } else {
-                cops.get(i - agents.size()).move();
-                Location arrestLocation = cops.get(i - agents.size()).getEnforceLocation();
+                cops.get(id - agents.size()).move();
+                Location arrestLocation = cops.get(id - agents.size()).getEnforceLocation();
                 if (arrestLocation != null) {
                     Agent arrestAgent = getAgentByLocation(arrestLocation);
                     if (arrestAgent != null) {
                         arrestAgent.sendToJail(random.nextInt(Params.MAX_JAIL_TERM));
                         map.setPatchStatus(arrestLocation, GridStatus.COP);
+                        arrest++;
                     }
                 }
             }
         }
-        map.print();
+        System.out.print("arise: " + arise + " ");
+
+        System.out.print("arrest: " + arrest + " ");
+//        map.print();
         analyze();
     }
 
@@ -90,5 +110,13 @@ public class Coordinator {
         }
         System.out.println("quiet: " + quietAgent + " jailed: " +
             jailedAgent + " active: " + activeAgent);
+        String csvFile = Params.dirPath + File.separator + "agent.csv";
+        try (PrintWriter writer = new PrintWriter(new FileWriter(csvFile, true))) {
+            writer.println(quietAgent + "," +
+                jailedAgent + "," + activeAgent);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
