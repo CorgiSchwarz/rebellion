@@ -26,7 +26,6 @@ public class Main {
         Params.MAX_JAIL_TERM = scanner.nextInt();
         Params.MOVEMENT = scanner.nextBoolean();
 
-//        init(numOfAgents, numOfCops, map);
         Coordinator coordinator = new Coordinator(numOfCops, numOfAgents, map);
         int tick = 0;
 
@@ -35,25 +34,4 @@ public class Main {
             coordinator.goTick();
         }
     }
-//    private static void init(int numOfAgents, int numOfCops, PatchMap map) {
-//        List<Integer> permutation = new ArrayList<>();
-//        for (int i = 0; i < map.getLength() * map.getWidth(); i++) {
-//            permutation.add(i);
-//        }
-//        Collections.shuffle(permutation);
-//
-//        agents = new ArrayList<>(numOfAgents);
-//        cops = new ArrayList<>(numOfCops);
-//        for (int i = 0; i < numOfAgents; i++) {
-//            Location location = new Location(permutation.get(i) / map.getWidth(),
-//                permutation.get(i) % map.getWidth());
-//            agents.add(new Agent(location, i, map));
-//        }
-//
-//        for (int i = numOfAgents; i < numOfAgents + numOfCops; i++) {
-//            Location location = new Location(permutation.get(i) / map.getWidth(),
-//                permutation.get(i) % map.getWidth());
-//            cops.add(new Cop(location, i, map));
-//        }
-//    }
 }

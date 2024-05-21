@@ -60,7 +60,6 @@ public class Agent extends Movable{
         if (netRisk > Params.THRESHOLD) {
             active = true;
             map.setPatchStatus(location, GridStatus.AGENT_ACTIVE);
-//            System.out.print("agent " + id + " is active");
         }
     }
 

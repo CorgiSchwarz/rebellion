@@ -85,7 +85,6 @@ public class PatchMap {
         return grid[location.y][location.x] == GridStatus.COP;
     }
 
-
     public void print() {
         for (int i = 0; i < length; i++) {
             for (int j = 0; j < width; j++) {

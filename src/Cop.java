@@ -20,15 +20,12 @@ public class Cop extends Movable {
         List<Location> suspects = new ArrayList<>();
         for (Location l : neighborhood) {
             if (map.active(l)) {
-//                System.out.print("active" + l);
                 suspects.add(l);
             }
         }
         if (!suspects.isEmpty()) {
             map.resetPatchStatus(location);
             int suspectIndex = randomGenerator.nextInt(suspects.size());
-//            map.setPatchStatus(suspects.get(suspectIndex), GridStatus.COP);
-//            System.out.print("arrest: " + l);
             return suspects.get(suspectIndex);
         }
         return null;
