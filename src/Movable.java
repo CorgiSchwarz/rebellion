@@ -19,9 +19,9 @@ public class Movable {
     }
 
     protected void move() {
-        map.resetPatchStatus(location);
         List<Location> neighborhood = map.getAvailablePatchesWithinVision(location);
         if (!neighborhood.isEmpty()) {
+            map.resetPatchStatus(location);
             Location target = neighborhood.get(randomGenerator.nextInt(neighborhood.size()));
             setLocation(target);
         }

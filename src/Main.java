@@ -1,5 +1,4 @@
 import java.io.File;
-import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -13,22 +12,6 @@ public class Main {
         Coordinator coordinator = new Coordinator(numOfCops, numOfAgents, map);
         int tick = 0;
 
-//        if (Params.EXTENSION) {
-//            while (tick++ < Params.TICKS / 2) {
-//                System.out.println("tick: " + tick);
-//                coordinator.goTick();
-//            }
-//            changeParam(coordinator);
-//            while (tick++ < Params.TICKS) {
-//                System.out.println("tick: " + tick);
-//                coordinator.goTick();
-//            }
-//        } else {
-//            while (tick++ < Params.TICKS) {
-//                System.out.println("tick: " + tick);
-//                coordinator.goTick();
-//            }
-//        }
         while (tick++ < Params.TICKS) {
             System.out.println("tick: " + tick);
             coordinator.goTick();
@@ -88,10 +71,6 @@ public class Main {
                 }
                 case "--extension" -> {
                     Params.EXTENSION = Boolean.parseBoolean(args[i + 1]);
-                    i++; // Skip next argument
-                }
-                case "--newGovernmentLegitimacy" -> {
-                    Params.NEW_GOVERNMENT_LEGITIMACY = Double.parseDouble(args[i + 1]);
                     i++; // Skip next argument
                 }
             }

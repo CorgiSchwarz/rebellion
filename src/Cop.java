@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Cop extends Movable {
     public Cop(Location location, int id, PatchMap map){
@@ -24,7 +23,9 @@ public class Cop extends Movable {
         if (!suspects.isEmpty()) {
             map.resetPatchStatus(location);
             int suspectIndex = randomGenerator.nextInt(suspects.size());
-            return suspects.get(suspectIndex);
+            Location suspectLocation = suspects.get(suspectIndex);
+            setLocation(suspectLocation);
+            return suspectLocation;
         }
         return null;
     }

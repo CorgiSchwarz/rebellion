@@ -17,11 +17,16 @@ public class Agent extends Movable{
     private int jailTerm = 0;
     private final double risk_aversion;
 
+//    private boolean easy = false;
+
     public Agent(Location location, int id, PatchMap map) {
         super(location, id, map);
         perceivedHardship = Math.random();
         risk_aversion = Math.random();
         grievance = perceivedHardship * (1 - Params.GOVERNMENT_LEGITIMACY);
+//        if (risk_aversion < 0.2 && perceivedHardship > 0.8) {
+//            easy = true;
+//        }
         active = false;
         map.setPatchStatus(location, GridStatus.AGENT_INACTIVE);
     }
@@ -34,7 +39,7 @@ public class Agent extends Movable{
         }
     }
 
-    private int getCopRatio() {
+    private double getCopRatio() {
         int copCount = 0, activeCount = 1;
         List<Location> neighborhood = map.getAllPatchesWithinVision(location);
         for (Location l: neighborhood) {
@@ -45,7 +50,7 @@ public class Agent extends Movable{
                 activeCount++;
             }
         }
-        return copCount / activeCount;
+        return Math.floor((double) copCount / activeCount);
     }
 
     boolean determineBehavior() {
@@ -65,15 +70,21 @@ public class Agent extends Movable{
     }
 
     public void sendToJail(int jailTerm) {
-        active = false;
-        this.jailTerm = jailTerm;
-        map.setPatchStatus(location, GridStatus.AGENT_JAILED);
+        if (jailTerm > 0) {
+            active = false;
+            this.jailTerm = jailTerm;
+            map.setPatchStatus(location, GridStatus.AGENT_JAILED);
+        }
+//        if (easy) {
+//            System.out.println("agent " + id + " jailed");
+//        }
+
 //        System.out.print(jailTerm + " ");
     }
 
     public void decreaseJailTerm() {
         this.jailTerm -= 1;
-        if (this.jailTerm == 0) {
+        if (this.jailTerm == 0 && map.notOccupied(location)) {
             map.setPatchStatus(location, GridStatus.AGENT_INACTIVE);
         }
     }
