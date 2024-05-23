@@ -1,6 +1,7 @@
 import java.util.List;
 import java.util.Random;
 public class Movable {
+    protected final Random randomGenerator = new Random();
 
     protected final int id;
     protected PatchMap map;
@@ -21,7 +22,7 @@ public class Movable {
         map.resetPatchStatus(location);
         List<Location> neighborhood = map.getAvailablePatchesWithinVision(location);
         if (!neighborhood.isEmpty()) {
-            Location target = neighborhood.get(new Random().nextInt(neighborhood.size()));
+            Location target = neighborhood.get(randomGenerator.nextInt(neighborhood.size()));
             setLocation(target);
         }
     }

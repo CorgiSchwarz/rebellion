@@ -3,8 +3,6 @@ import java.util.List;
 import java.util.Random;
 
 public class Cop extends Movable {
-    private final Random randomGenerator = new Random();
-
     public Cop(Location location, int id, PatchMap map){
         super(location, id, map);
         map.setPatchStatus(location, GridStatus.COP);

@@ -25,20 +25,20 @@ public class Coordinator {
         cops = new ArrayList<>(numOfCops);
 
         List<Integer> permutation = new ArrayList<>();
-        for (int i = 0; i < map.getLength() * map.getWidth(); i++) {
+        for (int i = 0; i < Params.MAP_WIDTH * Params.MAP_LENGTH; i++) {
             permutation.add(i);
         }
         Collections.shuffle(permutation);
 
         for (int i = 0; i < numOfAgents; i++) {
-            Location location = new Location(permutation.get(i) / map.getWidth(),
-                permutation.get(i) % map.getWidth());
+            Location location = new Location(permutation.get(i) / Params.MAP_LENGTH,
+                permutation.get(i) % Params.MAP_WIDTH);
             agents.add(new Agent(location, i, map));
         }
 
-        for (int i = agents.size(); i <numOfAgents + numOfCops; i++) {
-            Location location = new Location(permutation.get(i) / map.getWidth(),
-                permutation.get(i) % map.getWidth());
+        for (int i = numOfAgents; i < numOfAgents + numOfCops; i++) {
+            Location location = new Location(permutation.get(i) / Params.MAP_LENGTH,
+                permutation.get(i) % Params.MAP_WIDTH);
             cops.add(new Cop(location, i, map));
         }
         System.out.println("init map");
@@ -52,9 +52,9 @@ public class Coordinator {
         }
     }
 
-    Agent getAgentByLocation(Location location) {
+    Agent getActiveAgentByLocation(Location location) {
         for (Agent agent: agents) {
-            if (agent.location.equals(location)) {
+            if (agent.location.equals(location) && agent.isActive()) {
                 return agent;
             }
         }
@@ -71,28 +71,38 @@ public class Coordinator {
         int arise = 0;
         for (int i = 0; i < numbers.size(); i++) {
             int id = numbers.get(i);
-            if (id < agents.size()) {
-                agents.get(id).move();
-                boolean becomeActive = agents.get(id).determineBehavior();
-                if (becomeActive) {
-                    arise++;
-                }
-            } else {
+            if (id >= agents.size()) {
                 cops.get(id - agents.size()).move();
                 Location arrestLocation = cops.get(id - agents.size()).getEnforceLocation();
                 if (arrestLocation != null) {
-                    Agent arrestAgent = getAgentByLocation(arrestLocation);
+                    Agent arrestAgent = getActiveAgentByLocation(arrestLocation);
                     if (arrestAgent != null) {
                         arrestAgent.sendToJail(random.nextInt(Params.MAX_JAIL_TERM));
                         map.setPatchStatus(arrestLocation, GridStatus.COP);
                         arrest++;
                     }
                 }
+            } else if (agents.get(id).getJailTerm() == 0){
+                agents.get(id).move();
+                boolean becomeActive = agents.get(id).determineBehavior();
+                if (becomeActive) {
+                    arise++;
+                }
+            }
+        }
+        int release = 0;
+        for (Agent agent: agents) {
+            if (agent.getJailTerm() > 0) {
+                agent.decreaseJailTerm();
+                if (agent.getJailTerm() == 0) {
+                    release++;
+                }
             }
         }
         System.out.print("arise: " + arise + " ");
-
         System.out.print("arrest: " + arrest + " ");
+        System.out.print("release: " + release + " ");
+
 //        map.print();
         analyze();
     }
@@ -117,6 +127,11 @@ public class Coordinator {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    public void changeParam() {
+        for (Agent agent: agents) {
+            agent.onParamChange();
+        }
     }
 }
