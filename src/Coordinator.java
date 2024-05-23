@@ -31,14 +31,14 @@ public class Coordinator {
         Collections.shuffle(permutation);
 
         for (int i = 0; i < numOfAgents; i++) {
-            Location location = new Location(permutation.get(i) / Params.MAP_LENGTH,
-                permutation.get(i) % Params.MAP_WIDTH);
+            Location location = new Location(permutation.get(i) % Params.MAP_WIDTH,
+                permutation.get(i) % Params.MAP_LENGTH);
             agents.add(new Agent(location, i, map));
         }
 
         for (int i = numOfAgents; i < numOfAgents + numOfCops; i++) {
-            Location location = new Location(permutation.get(i) / Params.MAP_LENGTH,
-                permutation.get(i) % Params.MAP_WIDTH);
+            Location location = new Location(permutation.get(i) % Params.MAP_WIDTH,
+                permutation.get(i) % Params.MAP_LENGTH);
             cops.add(new Cop(location, i, map));
         }
         System.out.println("init map");
@@ -129,9 +129,4 @@ public class Coordinator {
         }
     }
 
-    public void changeParam() {
-        for (Agent agent: agents) {
-            agent.onParamChange();
-        }
-    }
 }

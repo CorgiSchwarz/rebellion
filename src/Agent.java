@@ -34,7 +34,7 @@ public class Agent extends Movable{
         }
     }
 
-    private double getCopRatio() {
+    private int getCopRatio() {
         int copCount = 0, activeCount = 1;
         List<Location> neighborhood = map.getAllPatchesWithinVision(location);
         for (Location l: neighborhood) {
@@ -45,13 +45,13 @@ public class Agent extends Movable{
                 activeCount++;
             }
         }
-        return (double) copCount / activeCount;
+        return copCount / activeCount;
     }
 
     boolean determineBehavior() {
         double copR = getCopRatio();
         double estimatedArrestProbability = 1 - Math.exp(
-            -Params.K * Math.floor(copR));
+            -Params.K * copR);
         double netRisk = grievance - risk_aversion * estimatedArrestProbability;
         if (netRisk > Params.THRESHOLD) {
             active = true;
@@ -78,7 +78,4 @@ public class Agent extends Movable{
         }
     }
 
-    public void onParamChange() {
-        grievance = perceivedHardship * (1 - Params.NEW_GOVERNMENT_LEGITIMACY);
-    }
 }

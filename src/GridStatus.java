@@ -3,7 +3,6 @@ public enum GridStatus {
     AGENT_ACTIVE(1),
     AGENT_INACTIVE(2),
     AGENT_JAILED(3),
-
     COP(4);
 
     private final int value;

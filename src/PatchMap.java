@@ -28,12 +28,12 @@ public class PatchMap {
 
     public List<Location> getAllPatchesWithinVision (Location location) {
         List<Location> result = new ArrayList<>();
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[0].length; j++) {
+        for (int i = 0; i < Params.MAP_LENGTH; i++) {
+            for (int j = 0; j < Params.MAP_WIDTH; j++) {
                 int distanceSquare = (int) (Math.pow(getXDistance(location.x, j), 2) +
                                     Math.pow(getYDistance(location.y, i), 2));
                 if (distanceSquare <= Params.VISION_RADIUS * Params.VISION_RADIUS) {
-                    result.add(new Location(i, j));
+                    result.add(new Location(j, i));
                 }
             }
         }

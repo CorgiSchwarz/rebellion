@@ -3,7 +3,6 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
         handleInput(args);
         PatchMap map = new PatchMap();
         createResultDir();
@@ -100,7 +99,4 @@ public class Main {
 
     }
 
-    private static void changeParam(Coordinator coordinator) {
-        coordinator.changeParam();
-    }
 }
