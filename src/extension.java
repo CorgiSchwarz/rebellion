@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 
 // Agent class
-class Agent {
+class Agent extends extension {
     private double riskAversion;
     private double perceivedHardship;
     private boolean active;
@@ -37,7 +37,7 @@ class Agent {
 }
 
 // Cop class
-class Cop {
+class Cop extends extension {
     private int x;
     private int y;
     private List<Cop> linkedCops;
