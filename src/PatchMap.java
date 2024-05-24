@@ -1,11 +1,15 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Represents a grid-based map of patches with statuses.
  */
 public class PatchMap {
     private GridStatus[][] grid;
+
+    // For extension only, indicates the locations where there are more than one active agent
+    private Stack<Location> emergencyLocations;
 
     /**
      * Constructor to initialize the grid with empty patches.
@@ -16,6 +20,9 @@ public class PatchMap {
             for (int j = 0; j < Params.MAP_WIDTH; j++) {
                 grid[i][j] = GridStatus.EMPTY;
             }
+        }
+        if (Params.EXTENSION) {
+            emergencyLocations = new Stack<>();
         }
     }
 
@@ -130,5 +137,25 @@ public class PatchMap {
             }
             System.out.print("\n");
         }
+    }
+
+    /**
+     * For extension only.
+     * Gets the location where there are more than one active agent
+     */
+    public Location getEmergencyLocation() {
+        if (!emergencyLocations.isEmpty()) {
+            return emergencyLocations.pop();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * For extension only.
+     * Adds the location where there are more than one active agent
+     */
+    public void addEmergencyLocation(Location l) {
+        emergencyLocations.push(l);
     }
 }

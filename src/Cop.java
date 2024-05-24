@@ -39,11 +39,26 @@ public class Cop extends Movable {
             }
         }
         if (!suspects.isEmpty()) {
+            // With extension: if there are too more active agents than a cop can handle,
+            // the cop notifies all the other cops that there is an emergency here
+            if (Params.EXTENSION && suspects.size() > 1) {
+                map.addEmergencyLocation(location);
+            }
             map.resetPatchStatus(location);
             int suspectIndex = randomGenerator.nextInt(suspects.size());
             Location suspectLocation = suspects.get(suspectIndex);
             setLocation(suspectLocation);
             return suspectLocation;
+        } else if (Params.EXTENSION) {
+            // With extension: if there is no active agent within the cop's vision,
+            // the cop checks whether there is an emergency so that she/he can go and help
+            Location emergencyLocation = map.getEmergencyLocation();
+            if (emergencyLocation != null) {
+                map.resetPatchStatus(location);
+                setLocation(emergencyLocation);
+                map.setPatchStatus(location, GridStatus.COP);
+                getEnforceLocation();
+            }
         }
         return null;
     }
