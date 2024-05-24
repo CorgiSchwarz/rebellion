@@ -96,9 +96,11 @@ public class Coordinator {
         int arrest = 0;
         int arise = 0;
         int release = 0;
+        // Turtles take actions in random order
         for (int i = 0; i < permutation.size(); i++) {
             int id = permutation.get(i);
             if (id >= agents.size()) {
+                // The cop moves and arrest an active agent within vision (if exists).
                 cops.get(id - agents.size()).move();
                 Location arrestLocation = cops.get(id - agents.size()).getEnforceLocation();
                 if (arrestLocation != null) {
@@ -110,6 +112,7 @@ public class Coordinator {
                     }
                 }
             } else if (agents.get(id).getJailTerm() == 0) {
+                // The free agent moves and determines whether to change her/his behavior.
                 agents.get(id).move();
                 boolean becomeActive = agents.get(id).determineBehavior();
                 if (becomeActive) {
