@@ -7,23 +7,36 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+
+/**
+ * Coordinator class that manages the simulation of agents and cops on the map.
+ */
 public class Coordinator {
     private ArrayList<Agent> agents;
     private ArrayList<Cop> cops;
     private PatchMap map;
-
     private Random random;
     private ArrayList<Integer> permutation;
-    private int totalJail = 0;
-    private int totalRelease = 0;
 
+    /**
+     * Constructor to initialize the Coordinator with a number of cops, agents, and a map.
+     * @param numOfCops Number of cops in the simulation.
+     * @param numOfAgents Number of agents in the simulation.
+     * @param map The PatchMap instance representing the simulation map.
+     */
     Coordinator(int numOfCops, int numOfAgents, PatchMap map) {
         this.map = map;
         random = new Random();
         init(numOfCops, numOfAgents);
     }
 
+    /**
+     * Initializes the simulation by setting up agents, cops, and their starting locations.
+     * @param numOfCops Number of cops to initialize.
+     * @param numOfAgents Number of agents to initialize.
+     */
     void init(int numOfCops, int numOfAgents) {
+        // uses a permutation to determine the order of acting within one tick
         permutation= new ArrayList<>();
         for (int i = 0; i < numOfAgents + numOfCops; i++) {
             permutation.add(i);
@@ -38,20 +51,21 @@ public class Coordinator {
         }
         Collections.shuffle(locationPermutation);
 
+        // Initialize agents with shuffled starting locations
         for (int i = 0; i < numOfAgents; i++) {
             Location location = new Location(locationPermutation.get(i) % Params.MAP_WIDTH,
                 locationPermutation.get(i) % Params.MAP_LENGTH);
             agents.add(new Agent(location, i, map));
         }
 
+        // Initialize cops with shuffled starting locations
         for (int i = numOfAgents; i < numOfAgents + numOfCops; i++) {
             Location location = new Location(locationPermutation.get(i) % Params.MAP_WIDTH,
                 locationPermutation.get(i) % Params.MAP_LENGTH);
             cops.add(new Cop(location, i, map));
         }
-        System.out.println("init map");
-//        map.print();
 
+        // Initialize a CSV file for recording agent states
         String csvFile = Params.dirPath + File.separator + "agent.csv";
         try (PrintWriter writer = new PrintWriter(new FileWriter(csvFile))) {
             writer.println("quiet,jailed,active");
@@ -60,6 +74,11 @@ public class Coordinator {
         }
     }
 
+    /**
+     * Retrieves the active agent at a specific location.
+     * @param location The location to check for an active agent.
+     * @return The active agent at the specified location, or null if none found.
+     */
     Agent getActiveAgentByLocation(Location location) {
         for (Agent agent: agents) {
             if (agent.location.equals(location) && agent.isActive()) {
@@ -69,6 +88,9 @@ public class Coordinator {
         return null;
     }
 
+    /**
+     * Executes one simulation tick where agents and cops perform actions.
+     */
     public void goTick() {
         Collections.shuffle(permutation);
         int arrest = 0;
@@ -93,12 +115,10 @@ public class Coordinator {
                 if (becomeActive) {
                     arise++;
                 }
-//                boolean becomeActive = agents.get(id).determineBehavior();
-//                if (becomeActive) {
-//                    arise++;
-//                }
             }
         }
+
+        // Handle releasing agents from jail at the end of their jail term
         for (Agent agent: agents) {
             if (agent.getJailTerm() > 0) {
                 agent.decreaseJailTerm();
@@ -107,18 +127,16 @@ public class Coordinator {
                 }
             }
         }
-        totalJail += arrest;
-        totalRelease += release;
         System.out.print("arise: " + arise + " ");
         System.out.print("arrest: " + arrest + " ");
         System.out.print("release: " + release + " ");
-        System.out.print("total release: " + totalRelease + " ");
-        System.out.print("total jail: " + totalJail + " ");
 
-//        map.print();
         analyze();
     }
 
+    /**
+     * Analyzes the current state of agents and records statistics to a CSV file.
+     */
     private void analyze() {
         int quietAgent = 0, jailedAgent = 0, activeAgent = 0;
         for (Agent agent: agents) {
@@ -140,5 +158,4 @@ public class Coordinator {
             throw new RuntimeException(e);
         }
     }
-
 }

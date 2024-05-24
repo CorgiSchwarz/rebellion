@@ -17,16 +17,11 @@ public class Agent extends Movable{
     private int jailTerm = 0;
     private final double risk_aversion;
 
-//    private boolean easy = false;
-
     public Agent(Location location, int id, PatchMap map) {
         super(location, id, map);
         perceivedHardship = Math.random();
         risk_aversion = Math.random();
         grievance = perceivedHardship * (1 - Params.GOVERNMENT_LEGITIMACY);
-//        if (risk_aversion < 0.2 && perceivedHardship > 0.8) {
-//            easy = true;
-//        }
         active = false;
         map.setPatchStatus(location, GridStatus.AGENT_INACTIVE);
     }
@@ -46,7 +41,7 @@ public class Agent extends Movable{
             if (map.haveCop(l)) {
                 copCount++;
             }
-            if (map.active(l)) {
+            if (map.haveActiveAgent(l)) {
                 activeCount++;
             }
         }
@@ -75,11 +70,6 @@ public class Agent extends Movable{
             this.jailTerm = jailTerm;
             map.setPatchStatus(location, GridStatus.AGENT_JAILED);
         }
-//        if (easy) {
-//            System.out.println("agent " + id + " jailed");
-//        }
-
-//        System.out.print(jailTerm + " ");
     }
 
     public void decreaseJailTerm() {
@@ -88,5 +78,4 @@ public class Agent extends Movable{
             map.setPatchStatus(location, GridStatus.AGENT_INACTIVE);
         }
     }
-
 }
