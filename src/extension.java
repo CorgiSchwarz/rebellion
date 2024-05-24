@@ -1,116 +1,149 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 
-class Extension {
-    private final List<Agent> agents;
-    private final List<Cop> cops;
-    private final double initialCopDensity;
-    private final double initialAgentDensity;
-    private final double k;
-    private final double threshold;
-    private final int vision;
 
-    public Extension(double initialCopDensity, double initialAgentDensity, double k, double threshold, int vision) {
-        this.initialCopDensity = initialCopDensity;
-        this.initialAgentDensity = initialAgentDensity;
-        this.k = k;
-        this.threshold = threshold;
-        this.vision = vision;
-        this.agents = new ArrayList<>();
-        this.cops = new ArrayList<>();
-    }
+// Agent class
+class Agent {
+    private double riskAversion;
+    private double perceivedHardship;
+    private boolean active;
+    private int jailTerm;
+    private int x;
+    private int y;
 
-    public void setup() {
-        createCops();
-        createAgents();
-    }
-
-    public void go() {
-        for (Agent agent : agents) {
-            new Thread(agent).start();
-        }
-        for (Cop cop : cops) {
-            new Thread(cop).start();
-        }
-    }
-
-    private void createCops() {
-        Random random = new Random();
-        for (int i = 0; i < initialCopDensity; i++) {
-            cops.add(new Cop(random.nextInt(vision), random.nextInt(vision)));
-        }
-    }
-
-    private void createAgents() {
-        Random random = new Random();
-        for (int i = 0; i < initialAgentDensity; i++) {
-            double riskAversion = random.nextDouble();
-            double perceivedHardship = random.nextDouble();
-            agents.add(new Agent(random.nextInt(vision), random.nextInt(vision), riskAversion, perceivedHardship, k, threshold));
-        }
-    }
-
-    public static void main(String[] args) {
-        Extension model = new Extension(20, 50, 2.3, 0.1, 5); // Example parameters
-        model.setup();
-        model.go();
-    }
-}
-
-class Agent implements Runnable {
-    private final int x;
-    private final int y;
-    private final double riskAversion;
-    private final double perceivedHardship;
-    private final double k;
-    private final double threshold;
-
-    public Agent(int x, int y, double riskAversion, double perceivedHardship, double k, double threshold) {
-        this.x = x;
-        this.y = y;
+    // Constructor
+    public Agent(double riskAversion, double perceivedHardship) {
         this.riskAversion = riskAversion;
         this.perceivedHardship = perceivedHardship;
-        this.k = k;
-        this.threshold = threshold;
     }
 
-    @Override
-    public void run() {
-        determineBehavior();
+    // Getters and setters
+    public void setCoordinates(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
-    private void determineBehavior() {
-        double grievance = perceivedHardship * (1 - Extension.GOVERNMENT_LEGITIMACY);
-        double estimatedArrestProbability = 1 - Math.exp(-k * Math.floor(k / (1 + k)));
-        boolean active = grievance - riskAversion * estimatedArrestProbability > threshold;
-
-        // Implement further behavior based on 'active' status
+    public void moveToRandomFreeLocation(int[][] grid) {
+        Random random = new Random();
+        int newX, newY;
+        do {
+            newX = random.nextInt(grid.length);
+            newY = random.nextInt(grid[0].length);
+        } while (grid[newX][newY] != 0); // Keep generating new coordinates until a free location is found
+        setCoordinates(newX, newY);
     }
 }
 
-class Cop implements Runnable {
-    private final int x;
-    private final int y;
+// Cop class
+class Cop {
+    private int x;
+    private int y;
+    private List<Cop> linkedCops;
+    private int targetX;
+    private int targetY;
 
+    // Constructor
     public Cop(int x, int y) {
         this.x = x;
         this.y = y;
+        this.linkedCops = new ArrayList<>();
     }
 
-    @Override
-    public void run() {
-        move();
+    // Method to add linked cop
+    public void addLinkedCop(Cop cop) {
+        linkedCops.add(cop);
     }
 
-    private void move() {
-        Random random = new Random();
-        int newX = x + random.nextInt(3) - 1; // Move randomly in x direction
-        int newY = y + random.nextInt(3) - 1; // Move randomly in y direction
+    // Method to share coordinates with another cop
+    public void shareCoordinates(Cop receiver) {
+        receiver.receiveCoordinates(this.x, this.y);
+    }
 
-        // Ensure the new position is within the vision radius
-        newX = Math.max(0, Math.min(newX, Extension.VISION - 1));
-        newY = Math.max(0, Math.min(newY, Extension.VISION - 1));
+    // Method to receive coordinates from another cop
+    public void receiveCoordinates(int x, int y) {
+        // Process received coordinates
+        this.targetX = x;
+        this.targetY = y;
+    }
 
+    // Method for cop movement
+    public void moveToTarget() {
+        setCoordinates(targetX, targetY);
+    }
+
+    // Getters and setters
+    public void setCoordinates(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+// Main class
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Get the number of cops from the user
+        System.out.println("Enter the number of cops: ");
+        int numCops = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        // Create a list to store the Cop objects
+        List<Cop> cops = new ArrayList<>();
+
+        // Create a 2D grid to represent the environment
+        int[][] grid = new int[10][10]; // Assuming a 10x10 grid for simplicity
+
+        // Prompt the user to enter coordinates for each cop
+        for (int i = 0; i < numCops; i++) {
+            System.out.println("Enter initial coordinates of cop" + (i + 1) + " (x y): ");
+            int x = scanner.nextInt();
+            int y = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            Cop cop = new Cop(x, y);
+            cops.add(cop);
+            grid[x][y] = 1; // Mark the location of cop as occupied
+        }
+
+        // Establish communication links between cops
+        for (int i = 0; i < numCops; i++) {
+            for (int j = i + 1; j < numCops; j++) {
+                cops.get(i).addLinkedCop(cops.get(j));
+                cops.get(j).addLinkedCop(cops.get(i));
+            }
+        }
+
+        // Share coordinates between cops
+        for (int i = 0; i < numCops; i++) {
+            for (int j = i + 1; j < numCops; j++) {
+                cops.get(i).shareCoordinates(cops.get(j));
+            }
+        }
+
+        // Move cops to their target coordinates
+        for (Cop cop : cops) {
+            cop.moveToTarget();
+        }
+
+        // Move agents to random free locations
+        List<Agent> agents = new ArrayList<>();
+        for (int i = 0; i < n; i++) { 
+            Agent agent = new Agent(riskAversion,percievedHardship); // Example riskAversion and perceivedHardship values
+            agents.add(agent);
+            agent.moveToRandomFreeLocation(grid);
+            grid[agent.x][agent.y] = 1; // Mark the location of agent as occupied
+        }
+
+        // Display final positions of cops and agents
+        for (Cop cop : cops) {
+            System.out.println("Cop at (" + cop.x + ", " + cop.y + ")");
+        }
+        for (Agent agent : agents) {
+            System.out.println("Agent at (" + agent.x + ", " + agent.y + ")");
+        }
+
+        scanner.close();
     }
 }
